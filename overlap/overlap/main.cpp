@@ -2,6 +2,7 @@
 #include <tchar.h>
 #include <vector>
 #include <string>
+#include <sstream>
 #include "windows.h"
 #include "iostream"
 using namespace std;
@@ -71,6 +72,7 @@ void reverse() {
 	int pos = 0;
 	string token = "";
 	string input(::data);
+	stringstream ss;
 
 	while ((pos = input.find(" ")) != string::npos) {
 		token = input.substr(0, pos);
@@ -81,10 +83,13 @@ void reverse() {
 	reverse(str.begin(), str.end());
 	
 	for (int i = 0; i < str.size(); i++) {
-		//printf("%d¹øÂ° %s\n", i, str[i]);
-		//sprintf(::data, "%s ", str[i]);
+		if (i != 0) {
+			ss << " ";
+		}
+		ss << str[i];
 	}
-	printf("%s", ::data);
+	
+	strcpy(::data, ss.str().c_str());
 }
 
 void main() {
