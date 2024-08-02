@@ -14,7 +14,7 @@ void main() {
 		_T("./file1.txt"),
 		_T("./file2.txt"),
 		_T("./file3.txt"),
-		_T("./file5.txt")
+		_T("./file4.txt")
 	};
 	HANDLE hFile[4];
 	HANDLE hThread[2];
@@ -23,8 +23,13 @@ void main() {
 	for (int i = 0; i < 4; i++) {
 		hFile[i] = CreateFile
 		(
-			fileNames[i], GENERIC_READ, 0, NULL,
-			OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL
+			fileNames[i], 
+			GENERIC_READ | GENERIC_WRITE,
+			0,
+			NULL,
+			OPEN_EXISTING,
+			FILE_FLAG_OVERLAPPED,
+			NULL
 		);
 		if (hFile == INVALID_HANDLE_VALUE)
 		{
@@ -63,17 +68,17 @@ void main() {
 DWORD WINAPI ThreadProc(LPVOID lpParam) {
 	bool bString;
 	OVERLAPPED ov;
-	char data[BUFSIZE + 1];
+	char data[BUFSIZE + 1] = { 0 };
 
 	HANDLE * mfile = (HANDLE *)lpParam;
 
 	ov.Offset = ov.OffsetHigh = 0;
 	ov.hEvent = NULL;
-	bString = ReadFile(mfile, data, sizeof(data), 0, &ov);
+	bString = ReadFile(*mfile, data, sizeof(data), 0, &ov);
 
 	if (!bString) {
 		if (GetLastError() == ERROR_IO_PENDING) {
-			if (WaitForSingleObject(mfile, INFINITE) == WAIT_OBJECT_0) {
+			if (WaitForSingleObject(*mfile, INFINITE) == WAIT_OBJECT_0) {
 				if (ov.Internal == 0) {
 					bString = true;
 				}
@@ -87,4 +92,7 @@ DWORD WINAPI ThreadProc(LPVOID lpParam) {
 	}
 
 	printf("%s\n", data);
+
+
+	return 0;
 }
