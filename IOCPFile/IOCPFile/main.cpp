@@ -8,6 +8,7 @@ using namespace std;
 #define BUFSIZE 512
 
 struct Filedata {
+	HANDLE hIocp;
 	HANDLE one;
 	HANDLE two;
 };
@@ -48,6 +49,7 @@ void main() {
 	array[0].two = hFile[2];
 	array[1].one = hFile[1];
 	array[1].two = hFile[3];
+	array[0].hIocp = array[1].hIocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 2);
 
 	hThread[0] =
 		CreateThread(
@@ -72,6 +74,11 @@ void main() {
 	}
 
 	WaitForMultipleObjects(2, hThread, TRUE, INFINITE);
+
+	for (int i = 0; i < 2; i++)
+	{
+		CloseHandle(array[i].hIocp);
+	}
 
 	for (int i = 0; i < 2; i++) {
 		CloseHandle(hThread[i]);
